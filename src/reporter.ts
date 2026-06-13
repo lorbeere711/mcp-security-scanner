@@ -7,6 +7,13 @@ const severityWeight: Record<Finding["severity"], number> = {
   critical: 4
 };
 
+const riskPoints: Record<Finding["severity"], number> = {
+  low: 5,
+  medium: 15,
+  high: 30,
+  critical: 50
+};
+
 export type ReportFormat = "text" | "json" | "sarif";
 
 export function formatReport(result: ScanResult): string {
@@ -14,11 +21,15 @@ export function formatReport(result: ScanResult): string {
     (a, b) => severityWeight[b.severity] - severityWeight[a.severity]
   );
 
+  const score = calculateRiskScore(sorted);
+  const level = riskBand(score);
+
   const lines = [
     `MCP Security Scan Report`,
     `Target: ${result.target}`,
     `Scanned At: ${result.scannedAt}`,
     `Findings: ${sorted.length}`,
+    `Risk Score: ${score}/100 (${level})`,
     ""
   ];
 
@@ -42,6 +53,23 @@ export function formatReport(result: ScanResult): string {
   });
 
   return lines.join("\n");
+}
+
+export function calculateRiskScore(findings: Finding[]): number {
+  const points = findings.reduce((total, finding) => total + riskPoints[finding.severity], 0);
+  return Math.min(100, points);
+}
+
+export function riskBand(score: number): "LOW" | "MED" | "HIGH" {
+  if (score >= 70) {
+    return "HIGH";
+  }
+
+  if (score >= 30) {
+    return "MED";
+  }
+
+  return "LOW";
 }
 
 export function formatJsonReport(result: ScanResult): string {

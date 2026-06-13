@@ -1,7 +1,7 @@
 {
   "name": "mcp-security-scanner",
   "version": "0.1.0",
-  "description": "CLI scanner for MCP server security risks",
+  "description": "The npm-audit for MCP servers",
   "type": "module",
   "bin": {
     "mcp-security-scanner": "dist/cli.js"
@@ -34,6 +34,14 @@
     "cli"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lorbeere711/mcp-security-scanner.git"
+  },
+  "homepage": "https://github.com/lorbeere711/mcp-security-scanner",
+  "bugs": {
+    "url": "https://github.com/lorbeere711/mcp-security-scanner/issues"
+  },
   "dependencies": {
     "commander": "^13.1.0",
     "js-yaml": "^4.1.0"

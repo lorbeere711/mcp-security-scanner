@@ -4,7 +4,9 @@ import { scanMcpConfig } from "../src/index.js";
 describe("scanMcpConfig", () => {
   it("finds dangerous permissions", () => {
     const result = scanMcpConfig("sample.json", {
-      permissions: ["shell", "filesystem:read"]
+      permissions: ["shell", "filesystem:read"],
+      name: "dangerous-server",
+      license: "MIT"
     });
 
     expect(result.findings.some((f) => f.id === "PERM-001")).toBe(true);
@@ -13,6 +15,9 @@ describe("scanMcpConfig", () => {
   it("returns no findings for safe config", () => {
     const result = scanMcpConfig("safe.json", {
       permissions: ["filesystem:read"],
+      name: "safe-server",
+      license: "MIT",
+      allowedPaths: ["/workspace"],
       tools: [{ name: "search", description: "Search local index with validation." }]
     });
 

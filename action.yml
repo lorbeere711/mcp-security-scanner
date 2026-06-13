@@ -1,0 +1,42 @@
+name: mcp-security-scanner
+description: The npm-audit for MCP servers.
+author: lorbeere711
+
+inputs:
+  target:
+    description: Path to MCP config file
+    required: false
+    default: ./mcp.json
+  server:
+    description: NPM package name of MCP server to scan
+    required: false
+  format:
+    description: Report format (text|json|sarif)
+    required: false
+    default: sarif
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+      shell: bash
+
+    - name: Build CLI
+      run: npm run build
+      shell: bash
+
+    - name: Run scanner
+      run: |
+        if [ -n "${{ inputs.server }}" ]; then
+          node dist/cli.js audit --server "${{ inputs.server }}" --format "${{ inputs.format }}"
+        else
+          node dist/cli.js audit "${{ inputs.target }}" --format "${{ inputs.format }}"
+        fi
+      shell: bash

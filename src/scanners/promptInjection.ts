@@ -9,6 +9,12 @@ const INJECTION_PATTERNS = [
   /bypass\s+(policy|guardrails?)/i
 ];
 
+const UNTRUSTED_CONTENT_PATTERNS = [
+  /inject\s+external\s+content\s+into\s+prompt/i,
+  /(fetch|retrieve).*(instructions|prompt).*(without|no)\s+validation/i,
+  /untrusted\s+(content|url|input).*(prompt|context)/i
+];
+
 export const scanPromptInjection: Scanner = ({ rawConfig }) => {
   const findings: Finding[] = [];
   const joined = deepCollectStrings(rawConfig).join("\n");
@@ -22,6 +28,21 @@ export const scanPromptInjection: Scanner = ({ rawConfig }) => {
         description: `Pattern \"${pattern.source}\" was found in server config/prompts.`,
         recommendation:
           "Harden prompts with strict boundaries and remove jailbreak-like instructions.",
+        path: "prompts"
+      });
+    }
+  }
+
+  for (const pattern of UNTRUSTED_CONTENT_PATTERNS) {
+    if (pattern.test(joined)) {
+      findings.push({
+        id: "PROMPT-002",
+        severity: "high",
+        title: "Untrusted content flow into prompts",
+        description:
+          `Pattern \"${pattern.source}\" suggests external content may be inserted into prompts without validation.`,
+        recommendation:
+          "Sanitize external data and enforce explicit allowlist/validation before adding it to model context.",
         path: "prompts"
       });
     }

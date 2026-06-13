@@ -1,5 +1,9 @@
 {
+  "name": "safe-filesystem-server",
+  "license": "MIT",
   "permissions": ["filesystem:read"],
+  "allowedPaths": ["/workspace"],
+  "allowedHosts": ["docs.example.com"],
   "tools": [
     {
       "name": "search-index",

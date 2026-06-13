@@ -8,13 +8,29 @@ const UNSAFE_DESC_MARKERS = [
   "accepts raw user input"
 ];
 
+const CAPABILITY_KEYWORDS = [
+  "exec",
+  "shell",
+  "read_file",
+  "write_file",
+  "delete",
+  "env",
+  "token",
+  "browser",
+  "http"
+];
+
 export const scanToolDescriptions: Scanner = ({ rawConfig }) => {
   const findings: Finding[] = [];
 
   const tools = extractTools(rawConfig);
   for (const tool of tools) {
+    const name = tool.name.toLowerCase();
     const description = (tool.description ?? "").toLowerCase();
     const marker = UNSAFE_DESC_MARKERS.find((m) => description.includes(m));
+    const capability = CAPABILITY_KEYWORDS.find(
+      (keyword) => name.includes(keyword) || description.includes(keyword)
+    );
 
     if (marker) {
       findings.push({
@@ -27,9 +43,22 @@ export const scanToolDescriptions: Scanner = ({ rawConfig }) => {
         path: `tools.${tool.name}`
       });
     }
+
+    if (capability) {
+      findings.push({
+        id: "TOOLS-002",
+        severity: capability === "exec" || capability === "shell" ? "high" : "medium",
+        title: "Potentially dangerous tool capability",
+        description:
+          `Tool \"${tool.name}\" references sensitive capability keyword \"${capability}\".`,
+        recommendation:
+          "Add strict authorization checks, validation, and least-privilege constraints for this tool.",
+        path: `tools.${tool.name}`
+      });
+    }
   }
 
-  return findings;
+  return dedupeByFingerprint(findings);
 };
 
 function extractTools(
@@ -55,4 +84,17 @@ function extractTools(
         description: typeof t.description === "string" ? t.description : undefined
       };
     });
+}
+
+function dedupeByFingerprint(findings: Finding[]): Finding[] {
+  const map = new Map<string, Finding>();
+
+  for (const finding of findings) {
+    const key = `${finding.id}:${finding.path ?? ""}:${finding.description}`;
+    if (!map.has(key)) {
+      map.set(key, finding);
+    }
+  }
+
+  return [...map.values()];
 }

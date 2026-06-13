@@ -1,4 +1,5 @@
 import { scanDataExfiltration } from "./scanners/dataExfiltration.js";
+import { scanMetadata } from "./scanners/metadata.js";
 import { scanPermissions } from "./scanners/permissions.js";
 import { scanPromptInjection } from "./scanners/promptInjection.js";
 import { scanToolDescriptions } from "./scanners/toolDescriptions.js";
@@ -8,7 +9,8 @@ const scanners: Scanner[] = [
   scanPermissions,
   scanPromptInjection,
   scanToolDescriptions,
-  scanDataExfiltration
+  scanDataExfiltration,
+  scanMetadata
 ];
 
 export function scanMcpConfig(target: string, config: unknown): ScanResult {
