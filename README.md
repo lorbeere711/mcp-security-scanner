@@ -88,18 +88,18 @@ npm run pack:check
 
 ```yaml
 - uses: lorbeere711/mcp-security-scanner@v0
-	with:
-		target: ./mcp.json
-		format: sarif
+  with:
+    target: ./mcp.json
+    format: sarif
 ```
 
 Or scan a server package:
 
 ```yaml
 - uses: lorbeere711/mcp-security-scanner@v0
-	with:
-		server: @modelcontextprotocol/server-filesystem
-		format: sarif
+  with:
+    server: @modelcontextprotocol/server-filesystem
+    format: sarif
 ```
 
 ## Publish Preparation

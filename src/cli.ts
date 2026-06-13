@@ -19,7 +19,7 @@ const require = createRequire(import.meta.url);
 program
   .name("mcp-security-scanner")
   .description("The npm-audit for MCP servers")
-  .version("0.1.0");
+  .version("0.2.0");
 
 registerScanLikeCommand("scan", "Scan an MCP config file or server package");
 registerScanLikeCommand("audit", "Audit MCP risk posture with explainable findings");
@@ -32,42 +32,42 @@ function registerScanLikeCommand(name: string, description: string): void {
     .description(description)
     .argument("[configPath]", "Path to MCP config (JSON or YAML)")
     .option("-s, --server <package>", "NPM package name of an MCP server")
-  .option("-f, --format <format>", "Output format: text|json|sarif", "text")
-  .option("-o, --output <file>", "Write report to file")
-  .action(
-    (
-      configPath: string | undefined,
-      options: {
-        server?: string;
-        format: string;
-        output?: string;
-      }
-    ) => {
-      try {
-        const input = loadTarget(configPath, options.server);
-        const result = scanMcpConfig(input.target, input.config);
-        const format = parseFormat(options.format);
-        const output = renderByFormat(format, result);
-
-        if (options.output) {
-          const outPath = path.resolve(process.cwd(), options.output);
-          fs.writeFileSync(outPath, output, "utf8");
-          console.log(`Report written to ${options.output}`);
-        } else {
-          console.log(output);
+    .option("-f, --format <format>", "Output format: text|json|sarif", "text")
+    .option("-o, --output <file>", "Write report to file")
+    .action(
+      (
+        configPath: string | undefined,
+        options: {
+          server?: string;
+          format: string;
+          output?: string;
         }
+      ) => {
+        try {
+          const input = loadTarget(configPath, options.server);
+          const result = scanMcpConfig(input.target, input.config);
+          const format = parseFormat(options.format);
+          const output = renderByFormat(format, result);
 
-        const hasHighOrCritical = result.findings.some((f) =>
-          ["high", "critical"].includes(f.severity)
-        );
-        process.exitCode = hasHighOrCritical ? 2 : 0;
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        console.error(`Scan failed: ${message}`);
-        process.exitCode = 1;
+          if (options.output) {
+            const outPath = path.resolve(process.cwd(), options.output);
+            fs.writeFileSync(outPath, output, "utf8");
+            console.log(`Report written to ${options.output}`);
+          } else {
+            console.log(output);
+          }
+
+          const hasHighOrCritical = result.findings.some((f) =>
+            ["high", "critical"].includes(f.severity)
+          );
+          process.exitCode = hasHighOrCritical ? 2 : 0;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error(`Scan failed: ${message}`);
+          process.exitCode = 1;
+        }
       }
-    }
-  );
+    );
 }
 
 function parseConfig(filePath: string, raw: string): unknown {
