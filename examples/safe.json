@@ -1,0 +1,9 @@
+{
+  "permissions": ["filesystem:read"],
+  "tools": [
+    {
+      "name": "search-index",
+      "description": "Search internal index with strict schema validation"
+    }
+  ]
+}

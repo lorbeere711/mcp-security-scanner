@@ -1,0 +1,53 @@
+{
+  "name": "mcp-security-scanner",
+  "version": "0.1.0",
+  "description": "CLI scanner for MCP server security risks",
+  "type": "module",
+  "bin": {
+    "mcp-security-scanner": "dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsup src/cli.ts src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run test && npm run build",
+    "pack:check": "npm pack --dry-run"
+  },
+  "keywords": [
+    "mcp",
+    "security",
+    "scanner",
+    "prompt-injection",
+    "cli"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^13.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.34.1",
+    "@typescript-eslint/parser": "^8.34.1",
+    "eslint": "^9.29.0",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
