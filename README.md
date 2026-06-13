@@ -2,7 +2,26 @@
 
 The npm-audit for MCP servers.
 
+Before installing an MCP server, run one command and see what it can actually do.
+
 Scan MCP servers for dangerous tools, prompt-injection risks, excessive permissions, and unsafe agent capabilities before you connect them to Claude, Codex, Cursor, or other AI agents.
+
+![MCP Security Scanner terminal demo](assets/demo.svg)
+
+## Quick Start
+
+```bash
+npx mcp-security-scanner scan ./mcp-server-config.json
+```
+
+Add it to CI:
+
+```yaml
+- uses: lorbeere711/mcp-security-scanner@v0
+  with:
+    target: ./mcp.json
+    format: sarif
+```
 
 ## Positioning
 
@@ -118,6 +137,12 @@ If checks pass, publish from a trusted environment with npm credentials configur
 - help wanted: improve SARIF mapping for GitHub code scanning UX
 - help wanted: add MCP server registry scanner support
 - research: map known MCP vulnerabilities to detector rules
+
+See [docs/ISSUES.md](docs/ISSUES.md) for ready-to-open issue drafts.
+
+## Launch Kit
+
+Want to share the project or help it reach MCP builders? See [docs/LAUNCH.md](docs/LAUNCH.md) for post templates, launch channels, and the first content campaign.
 
 ## Roadmap
 

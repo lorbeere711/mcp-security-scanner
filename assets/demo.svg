@@ -1,0 +1,21 @@
+<svg width="920" height="520" viewBox="0 0 920 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">MCP Security Scanner terminal demo</title>
+  <desc id="desc">Terminal output showing high, medium, and low security findings for an MCP config scan.</desc>
+  <rect width="920" height="520" rx="18" fill="#0B1020"/>
+  <rect x="24" y="24" width="872" height="472" rx="14" fill="#111827" stroke="#263244"/>
+  <circle cx="52" cy="52" r="7" fill="#EF4444"/>
+  <circle cx="76" cy="52" r="7" fill="#F59E0B"/>
+  <circle cx="100" cy="52" r="7" fill="#22C55E"/>
+  <text x="42" y="96" fill="#93C5FD" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18">$ npx mcp-security-scanner scan ./mcp.json</text>
+  <text x="42" y="145" fill="#E5E7EB" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18">MCP Security Scanner</text>
+  <text x="42" y="178" fill="#9CA3AF" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="16">Target: ./mcp.json</text>
+  <text x="42" y="231" fill="#F87171" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="17" font-weight="700">HIGH</text>
+  <text x="122" y="231" fill="#F9FAFB" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="17">filesystem tool exposes /Users without allowlist</text>
+  <text x="122" y="260" fill="#9CA3AF" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15">fix: restrict filesystem tools to explicit project directories</text>
+  <text x="42" y="314" fill="#FBBF24" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="17" font-weight="700">MED</text>
+  <text x="122" y="314" fill="#F9FAFB" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="17">tool "fetch_url" can retrieve arbitrary external content</text>
+  <text x="122" y="343" fill="#9CA3AF" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15">fix: add domain allowlists and treat remote text as untrusted</text>
+  <text x="42" y="397" fill="#60A5FA" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="17" font-weight="700">LOW</text>
+  <text x="122" y="397" fill="#F9FAFB" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="17">server metadata missing license</text>
+  <text x="42" y="453" fill="#A7F3D0" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18">Summary: 1 high, 1 medium, 1 low</text>
+</svg>
