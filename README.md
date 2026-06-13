@@ -57,7 +57,7 @@ mcp-security-scanner scan ./mcp-server-config.json --format sarif --output repor
 Formats:
 
 - `text`: human-readable report (default)
-- `json`: machine-readable full scan result
+- `json`: machine-readable full scan result (`schemaVersion: "1.0.0"`)
 - `sarif`: SARIF 2.1.0 report for code scanning tools
 
 Example output:

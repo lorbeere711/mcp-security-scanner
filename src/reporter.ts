@@ -1,5 +1,9 @@
 import type { Finding, ScanResult } from "./types.js";
 
+interface JsonReport extends ScanResult {
+  schemaVersion: string;
+}
+
 const severityWeight: Record<Finding["severity"], number> = {
   low: 1,
   medium: 2,
@@ -73,7 +77,12 @@ export function riskBand(score: number): "LOW" | "MED" | "HIGH" {
 }
 
 export function formatJsonReport(result: ScanResult): string {
-  return JSON.stringify(result, null, 2);
+  const report: JsonReport = {
+    schemaVersion: "1.0.0",
+    ...result
+  };
+
+  return JSON.stringify(report, null, 2);
 }
 
 export function formatSarifReport(result: ScanResult): string {

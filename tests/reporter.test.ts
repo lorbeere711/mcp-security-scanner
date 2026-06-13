@@ -30,7 +30,8 @@ describe("reporters", () => {
 
   it("renders json report", () => {
     const json = formatJsonReport(sampleResult);
-    const parsed = JSON.parse(json) as ScanResult;
+    const parsed = JSON.parse(json) as ScanResult & { schemaVersion: string };
+    expect(parsed.schemaVersion).toBe("1.0.0");
     expect(parsed.target).toBe("examples/insecure.json");
     expect(parsed.findings.length).toBe(1);
   });
