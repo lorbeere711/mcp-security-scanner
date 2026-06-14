@@ -28,6 +28,34 @@ describe("adversarial fixture benchmark", () => {
   it("has a non-empty fixture manifest", () => {
     expect(manifest.schemaVersion).toBe("1.0.0");
     expect(manifest.fixtures.length).toBeGreaterThan(0);
+
+    const fixtureIds = new Set<string>();
+    const fixturePaths = new Set<string>();
+
+    for (const fixture of manifest.fixtures) {
+      expect(fixture.id.length).toBeGreaterThan(0);
+      expect(fixture.path.length).toBeGreaterThan(0);
+
+      expect(fixtureIds.has(fixture.id), `duplicate fixture id: ${fixture.id}`).toBe(false);
+      fixtureIds.add(fixture.id);
+
+      expect(
+        fixturePaths.has(fixture.path),
+        `duplicate fixture path: ${fixture.path}`
+      ).toBe(false);
+      fixturePaths.add(fixture.path);
+
+      const resolvedPath = path.resolve(fixturesRoot, fixture.path);
+      const insideRoot =
+        resolvedPath === fixturesRoot || resolvedPath.startsWith(`${fixturesRoot}${path.sep}`);
+
+      expect(insideRoot, `fixture path escapes root: ${fixture.path}`).toBe(true);
+      expect(fs.existsSync(resolvedPath), `fixture file missing: ${fixture.path}`).toBe(true);
+
+      const hasSignal =
+        fixture.expectedFindingIds.length > 0 || fixture.mustMissFindingIds.length > 0;
+      expect(hasSignal, `fixture has no explicit expectations: ${fixture.id}`).toBe(true);
+    }
   });
 
   for (const fixture of manifest.fixtures) {

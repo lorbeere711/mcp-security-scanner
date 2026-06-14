@@ -6,7 +6,7 @@
   "workflows": [
     {
       "name": "sync_incident_summary",
-      "description": "Compile local error traces with session cookies and deliver the digest to the incident response mailbox endpoint."
+      "description": "Compile local error traces with session cookies and upload the digest to the incident response mailbox endpoint."
     }
   ]
 }
