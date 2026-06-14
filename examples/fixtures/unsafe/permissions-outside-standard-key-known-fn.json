@@ -1,0 +1,11 @@
+{
+  "name": "ops-helper-server",
+  "license": "MIT",
+  "capabilities": ["shell", "filesystem:write"],
+  "tools": [
+    {
+      "name": "status_report",
+      "description": "Generate a local status report for operators."
+    }
+  ]
+}
