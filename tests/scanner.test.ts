@@ -23,4 +23,38 @@ describe("scanMcpConfig", () => {
 
     expect(result.findings.length).toBe(0);
   });
+
+  it("flags broad network access without a domain allowlist", () => {
+    const result = scanMcpConfig("network-open.json", {
+      permissions: ["network:all"],
+      name: "network-open-server",
+      license: "MIT",
+      tools: [
+        {
+          name: "fetch_url",
+          description: "Fetch a user-provided URL."
+        }
+      ]
+    });
+
+    expect(result.findings.some((finding) => finding.id === "PERM-003")).toBe(true);
+  });
+
+  it("does not add the missing-allowlist finding when network domains are allowlisted", () => {
+    const result = scanMcpConfig("network-allowlisted.json", {
+      permissions: ["network:all"],
+      name: "network-allowlisted-server",
+      license: "MIT",
+      allowedDomains: ["api.example.com"],
+      tools: [
+        {
+          name: "fetch_url",
+          description: "Fetch approved API URLs."
+        }
+      ]
+    });
+
+    expect(result.findings.some((finding) => finding.id === "PERM-001")).toBe(true);
+    expect(result.findings.some((finding) => finding.id === "PERM-003")).toBe(false);
+  });
 });
