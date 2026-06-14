@@ -138,11 +138,7 @@ If checks pass, publish from a trusted environment with npm credentials configur
 - help wanted: add MCP server registry scanner support
 - research: map known MCP vulnerabilities to detector rules
 
-See [docs/ISSUES.md](docs/ISSUES.md) for ready-to-open issue drafts.
-
-## Launch Kit
-
-Want to share the project or help it reach MCP builders? See [docs/LAUNCH.md](docs/LAUNCH.md) for post templates, launch channels, and the first content campaign.
+See [docs/ROADMAP.md](docs/ROADMAP.md) for planned work and evaluation ideas.
 
 ## Roadmap
 

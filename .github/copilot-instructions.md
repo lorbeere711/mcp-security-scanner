@@ -1,20 +1,18 @@
-- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+# Copilot Instructions
 
-- [x] Clarify Project Requirements
+`mcp-security-scanner` is a deterministic security scanner for MCP server configs and metadata.
 
-- [x] Scaffold the Project
+Project goals:
 
-- [x] Customize the Project
+- Keep default scanning deterministic and explainable.
+- Prefer stable rule IDs and actionable remediation text.
+- Avoid vague safe/unsafe verdicts.
+- Treat semantic or LLM-assisted review as optional future work, not default CI behavior.
+- Document known limitations, especially false positives and false negatives.
 
-- [x] Install Required Extensions
+Development guidelines:
 
-- [x] Compile the Project
-
-- [x] Create and Run Task
-
-- [x] Launch the Project
-
-- [x] Ensure Documentation is Complete
-- Work through each checklist item systematically.
-- Keep communication concise and focused.
-- Follow development best practices.
+- Add tests for every new scanner rule.
+- Keep fixtures sanitized and free of real secrets.
+- Preserve JSON and SARIF output stability.
+- Run `npm run lint`, `npm run test`, `npm run typecheck`, and `npm run build` before merging.
