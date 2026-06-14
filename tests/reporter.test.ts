@@ -6,6 +6,10 @@ import {
 } from "../src/reporter.js";
 import type { ScanResult } from "../src/types.js";
 
+interface JsonReport extends ScanResult {
+  schemaVersion: string;
+}
+
 const sampleResult: ScanResult = {
   target: "examples/insecure.json",
   scannedAt: "2026-06-13T00:00:00.000Z",
@@ -30,10 +34,26 @@ describe("reporters", () => {
 
   it("renders json report", () => {
     const json = formatJsonReport(sampleResult);
-    const parsed = JSON.parse(json) as ScanResult & { schemaVersion: string };
+    const parsed = JSON.parse(json) as JsonReport;
+
     expect(parsed.schemaVersion).toBe("1.0.0");
     expect(parsed.target).toBe("examples/insecure.json");
+    expect(parsed.scannedAt).toBe("2026-06-13T00:00:00.000Z");
+    expect(Object.keys(parsed).sort()).toEqual([
+      "findings",
+      "scannedAt",
+      "schemaVersion",
+      "target"
+    ]);
     expect(parsed.findings.length).toBe(1);
+    expect(Object.keys(parsed.findings[0] ?? {}).sort()).toEqual([
+      "description",
+      "id",
+      "path",
+      "recommendation",
+      "severity",
+      "title"
+    ]);
   });
 
   it("renders sarif report", () => {

@@ -79,6 +79,31 @@ Formats:
 - `json`: machine-readable full scan result (`schemaVersion: "1.0.0"`)
 - `sarif`: SARIF 2.1.0 report for code scanning tools
 
+JSON schema version `1.0.0` is stable for automation consumers:
+
+```json
+{
+  "schemaVersion": "1.0.0",
+  "target": "examples/insecure.json",
+  "scannedAt": "2026-06-13T00:00:00.000Z",
+  "findings": [
+    {
+      "id": "PERM-001",
+      "severity": "high",
+      "title": "Dangerous permission detected",
+      "description": "Permission shell can enable high-impact actions.",
+      "recommendation": "Apply least-privilege.",
+      "path": "permissions"
+    }
+  ]
+}
+```
+
+Required top-level fields are `schemaVersion`, `target`, `scannedAt`, and
+`findings`. Each finding includes `id`, `severity`, `title`, `description`, and
+`recommendation`; `path` is included when the scanner can point to a specific
+config location.
+
 Example output:
 
 ```text
