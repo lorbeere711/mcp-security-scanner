@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { scanMcpConfig } from "../src/index.js";
+import { scanMcpConfig, SCHEMA_VERSION } from "../src/index.js";
 
 describe("scanMcpConfig", () => {
   it("finds dangerous permissions", () => {
@@ -22,5 +22,15 @@ describe("scanMcpConfig", () => {
     });
 
     expect(result.findings.length).toBe(0);
+  });
+
+  it("includes schemaVersion in result", () => {
+    const result = scanMcpConfig("test.json", {
+      permissions: [],
+      name: "test-server",
+      license: "MIT"
+    });
+
+    expect(result.schemaVersion).toBe(SCHEMA_VERSION);
   });
 });

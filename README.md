@@ -76,8 +76,50 @@ mcp-security-scanner scan ./mcp-server-config.json --format sarif --output repor
 Formats:
 
 - `text`: human-readable report (default)
-- `json`: machine-readable full scan result (`schemaVersion: "1.0.0"`)
+- `json`: machine-readable full scan result (see [JSON Schema](#json-schema))
 - `sarif`: SARIF 2.1.0 report for code scanning tools
+
+### JSON Schema
+
+The JSON report includes a `schemaVersion` field so consumers can validate compatibility.
+
+```jsonc
+{
+  "schemaVersion": "1.0.0",
+  "target": "./mcp-server-config.json",
+  "scannedAt": "2026-06-14T00:00:00.000Z",
+  "findings": [
+    {
+      "id": "PERM-001",
+      "severity": "high",
+      "title": "Dangerous permission detected",
+      "description": "Permission shell can enable high-impact actions.",
+      "recommendation": "Apply least-privilege.",
+      "path": "permissions"
+    }
+  ]
+}
+```
+
+**Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `schemaVersion` | `string` | Semantic version of the report schema (e.g. `"1.0.0"`) |
+| `target` | `string` | Path or package name of the scanned MCP config |
+| `scannedAt` | `string` | ISO 8601 timestamp of the scan |
+| `findings` | `Finding[]` | Array of detected security findings |
+
+Each `Finding` object:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique finding identifier (e.g. `PERM-001`) |
+| `severity` | `"low" \| "medium" \| "high" \| "critical"` | Risk level |
+| `title` | `string` | Short description of the finding |
+| `description` | `string` | Detailed explanation |
+| `recommendation` | `string` | Actionable remediation text |
+| `path` | `string \| undefined` | Optional JSON path to the risky config key |
 
 Example output:
 
