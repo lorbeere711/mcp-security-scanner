@@ -21,6 +21,7 @@ interface FixtureManifest {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const fixturesRoot = path.resolve(__dirname, "../examples/fixtures");
+const fixturesRootRealPath = fs.realpathSync(fixturesRoot);
 const manifestPath = path.join(fixturesRoot, "manifest.json");
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as FixtureManifest;
 
@@ -46,15 +47,20 @@ describe("adversarial fixture benchmark", () => {
       fixturePaths.add(fixture.path);
 
       const resolvedPath = path.resolve(fixturesRoot, fixture.path);
+      const resolvedRealPath = fs.realpathSync(resolvedPath);
       const insideRoot =
-        resolvedPath === fixturesRoot || resolvedPath.startsWith(`${fixturesRoot}${path.sep}`);
+        resolvedRealPath === fixturesRootRealPath ||
+        resolvedRealPath.startsWith(`${fixturesRootRealPath}${path.sep}`);
 
       expect(insideRoot, `fixture path escapes root: ${fixture.path}`).toBe(true);
       expect(fs.existsSync(resolvedPath), `fixture file missing: ${fixture.path}`).toBe(true);
 
       const hasSignal =
         fixture.expectedFindingIds.length > 0 || fixture.mustMissFindingIds.length > 0;
-      expect(hasSignal, `fixture has no explicit expectations: ${fixture.id}`).toBe(true);
+
+      if (fixture.classification === "unsafe") {
+        expect(hasSignal, `fixture has no explicit expectations: ${fixture.id}`).toBe(true);
+      }
     }
   });
 

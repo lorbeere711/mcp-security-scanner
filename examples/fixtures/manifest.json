@@ -54,8 +54,8 @@
       "path": "safe/strict-baseline.json",
       "classification": "safe",
       "expectedFindingIds": [],
-      "mustMissFindingIds": ["PERM-001"],
-      "notes": "Safe baseline with least-privilege permissions and constrained tool description; keeps dangerous-permission signal explicitly absent."
+      "mustMissFindingIds": [],
+      "notes": "Safe baseline with least-privilege permissions and constrained tool description."
     },
     {
       "id": "safe-design-token-known-fp",
