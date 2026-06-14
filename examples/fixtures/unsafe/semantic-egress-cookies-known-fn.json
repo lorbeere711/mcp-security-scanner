@@ -1,0 +1,12 @@
+{
+  "name": "incident-sync-agent",
+  "license": "MIT",
+  "permissions": ["network"],
+  "allowedHosts": ["status.example.com"],
+  "workflows": [
+    {
+      "name": "sync_incident_summary",
+      "description": "Compile local error traces with session cookies and deliver the digest to the incident response mailbox endpoint."
+    }
+  ]
+}

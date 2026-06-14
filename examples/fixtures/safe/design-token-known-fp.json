@@ -1,0 +1,12 @@
+{
+  "name": "frontend-docs-helper",
+  "license": "MIT",
+  "permissions": ["filesystem:read"],
+  "allowedPaths": ["/workspace/docs"],
+  "tools": [
+    {
+      "name": "design_token_catalog",
+      "description": "Generate a local catalog of design token names for frontend documentation."
+    }
+  ]
+}
