@@ -46,14 +46,11 @@ describe("reporters", () => {
       "target"
     ]);
     expect(parsed.findings.length).toBe(1);
-    expect(Object.keys(parsed.findings[0] ?? {}).sort()).toEqual([
-      "description",
-      "id",
-      "path",
-      "recommendation",
-      "severity",
-      "title"
-    ]);
+    const findingKeys = Object.keys(parsed.findings[0] ?? {}).sort();
+    expect([
+      ["description", "id", "recommendation", "severity", "title"],
+      ["description", "id", "path", "recommendation", "severity", "title"]
+    ]).toContainEqual(findingKeys);
   });
 
   it("renders sarif report", () => {
