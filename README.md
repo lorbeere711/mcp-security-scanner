@@ -234,6 +234,7 @@ If checks pass, publish from a trusted environment with npm credentials configur
 - help wanted: improve SARIF mapping for GitHub code scanning UX
 - help wanted: add MCP server registry scanner support
 - research: map known MCP vulnerabilities to detector rules
+- published 20-server report: [docs/SECURITY_PATTERNS_REPORT.md](docs/SECURITY_PATTERNS_REPORT.md)
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for planned work and evaluation ideas.
 
