@@ -13,6 +13,11 @@ import {
 } from "./reporter.js";
 import { scanMcpConfig } from "./index.js";
 import {
+  exitCodeForFindings,
+  parseFailOnThreshold,
+  type FailOnThreshold
+} from "./failOn.js";
+import {
   DEFAULT_AI_ENDPOINT,
   DEFAULT_AI_MODEL,
   DEFAULT_AI_PROVIDER,
@@ -42,6 +47,12 @@ function registerScanLikeCommand(name: string, description: string): void {
     .option("-s, --server <package>", "NPM package name of an MCP server")
     .option("-f, --format <format>", "Output format: text|json|sarif", "text")
     .option("-o, --output <file>", "Write report to file")
+    .option(
+      "--fail-on <severity>",
+      "Fail with exit code 2 for findings at or above: critical|high|medium|low|none",
+      parseFailOnThreshold,
+      "high"
+    )
     .option("--ai-review", "Run experimental local AI semantic review")
     .option("--ai-provider <provider>", "AI provider: ollama|mock", DEFAULT_AI_PROVIDER)
     .option("--ai-model <model>", "Local AI model name", DEFAULT_AI_MODEL)
@@ -54,6 +65,7 @@ function registerScanLikeCommand(name: string, description: string): void {
           server?: string;
           format: string;
           output?: string;
+          failOn: FailOnThreshold;
           aiReview?: boolean;
           aiProvider: string;
           aiModel: string;
@@ -92,10 +104,10 @@ function registerScanLikeCommand(name: string, description: string): void {
             console.log(output);
           }
 
-          const hasHighOrCritical = result.findings.some((f) =>
-            ["high", "critical"].includes(f.severity)
+          process.exitCode = exitCodeForFindings(
+            result.findings,
+            options.failOn
           );
-          process.exitCode = hasHighOrCritical ? 2 : 0;
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
           console.error(`Scan failed: ${message}`);

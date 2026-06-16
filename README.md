@@ -71,6 +71,8 @@ mcp-security-scanner scan --server @modelcontextprotocol/server-filesystem
 mcp-security-scanner audit ./mcp-server-config.json --format sarif
 mcp-security-scanner scan ./mcp-server-config.json --format json
 mcp-security-scanner scan ./mcp-server-config.json --format sarif --output report.sarif
+mcp-security-scanner scan ./mcp-server-config.json --fail-on critical
+mcp-security-scanner scan ./mcp-server-config.json --fail-on none
 mcp-security-scanner scan ./mcp-server-config.json --ai-review
 ```
 
@@ -79,6 +81,14 @@ Formats:
 - `text`: human-readable report (default)
 - `json`: machine-readable full scan result (see [JSON Schema](#json-schema))
 - `sarif`: SARIF 2.1.0 report for code scanning tools
+
+CI failure threshold:
+
+- `--fail-on critical`: fail only on critical findings
+- `--fail-on high`: fail on high or critical findings (default)
+- `--fail-on medium`: fail on medium, high, or critical findings
+- `--fail-on low`: fail on any finding
+- `--fail-on none`: report-only mode, never fail because of findings
 
 Experimental local AI review:
 
@@ -151,9 +161,9 @@ LOW   missing server metadata / license
 
 Exit codes:
 
-- `0`: no high or critical findings
+- `0`: no findings at or above the configured `--fail-on` threshold
 - `1`: scanner/runtime error
-- `2`: high or critical findings detected
+- `2`: findings detected at or above the configured `--fail-on` threshold
 
 ## Development
 
