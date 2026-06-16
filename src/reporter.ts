@@ -18,7 +18,7 @@ const riskPoints: Record<Finding["severity"], number> = {
   critical: 50
 };
 
-export type ReportFormat = "text" | "json" | "sarif";
+export type ReportFormat = "text" | "json" | "sarif" | "markdown";
 
 export function formatReport(result: ScanResult): string {
   const sorted = [...result.findings].sort(
@@ -91,6 +91,66 @@ export function formatJsonReport(result: ScanResult): string {
   };
 
   return JSON.stringify(report, null, 2);
+}
+
+export function formatMarkdownReport(result: ScanResult): string {
+  const sorted = [...result.findings].sort(
+    (a, b) => severityWeight[b.severity] - severityWeight[a.severity]
+  );
+  const score = calculateRiskScore(sorted);
+  const level = riskBand(score);
+  const counts = severityCounts(sorted);
+
+  const lines = [
+    "# MCP Security Scan Report",
+    "",
+    `Target: \`${inlineCode(result.target)}\``,
+    `Scanned at: ${result.scannedAt}`,
+    `Risk score: **${score}/100 (${level})**`,
+    "",
+    "## Summary",
+    "",
+    "| Severity | Count |",
+    "| --- | ---: |",
+    `| critical | ${counts.critical} |`,
+    `| high | ${counts.high} |`,
+    `| medium | ${counts.medium} |`,
+    `| low | ${counts.low} |`,
+    ""
+  ];
+
+  if (sorted.length === 0) {
+    lines.push("No findings detected.");
+    return lines.join("\n");
+  }
+
+  lines.push(
+    "## Findings",
+    "",
+    "| Severity | ID | Finding | Path | Recommendation | Source | Confidence | Evidence |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |"
+  );
+
+  sorted.forEach((finding) => {
+    lines.push(
+      [
+        finding.severity,
+        finding.id,
+        finding.title,
+        finding.path ?? "-",
+        finding.recommendation,
+        finding.source ?? "-",
+        finding.confidence ?? "-",
+        finding.evidence?.length ? finding.evidence.join("; ") : "-"
+      ]
+        .map(markdownTableCell)
+        .join(" | ")
+        .replace(/^/, "| ")
+        .replace(/$/, " |")
+    );
+  });
+
+  return lines.join("\n");
 }
 
 export function formatSarifReport(result: ScanResult): string {
@@ -167,4 +227,22 @@ function buildRules(findings: Finding[]) {
       text: finding.recommendation
     }
   }));
+}
+
+function severityCounts(findings: Finding[]): Record<Finding["severity"], number> {
+  return findings.reduce(
+    (counts, finding) => ({
+      ...counts,
+      [finding.severity]: counts[finding.severity] + 1
+    }),
+    { low: 0, medium: 0, high: 0, critical: 0 }
+  );
+}
+
+function markdownTableCell(value: string): string {
+  return value.replace(/\|/g, "\\|").replace(/\r?\n/g, "<br>");
+}
+
+function inlineCode(value: string): string {
+  return value.replace(/`/g, "\\`");
 }
