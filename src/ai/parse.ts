@@ -3,6 +3,8 @@ import type { RawAiFinding } from "./types.js";
 
 const severities = new Set<Severity>(["low", "medium", "high", "critical"]);
 const confidences = new Set(["low", "medium", "high"]);
+const riskyEvidencePattern =
+  /\b(share|send|upload|external|endpoint|webhook|token|secret|credential|password|ignore instructions|ignore previous|system prompt|developer message)\b/i;
 
 export function parseAiReviewResponse(content: string): Finding[] {
   const parsed = JSON.parse(stripJsonFences(content)) as unknown;
@@ -16,7 +18,9 @@ export function parseAiReviewResponse(content: string): Finding[] {
     throw new Error("AI review response must contain a findings array.");
   }
 
-  return findings.map((finding, index) => normalizeFinding(finding, index));
+  return findings
+    .map((finding, index) => normalizeFinding(finding, index))
+    .filter(hasRiskyEvidence);
 }
 
 function stripJsonFences(content: string): string {
@@ -83,4 +87,8 @@ function normalizeEvidence(value: unknown): string[] {
 
 function normalizeString(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : fallback;
+}
+
+function hasRiskyEvidence(finding: Finding): boolean {
+  return Boolean(finding.evidence?.some((snippet) => riskyEvidencePattern.test(snippet)));
 }

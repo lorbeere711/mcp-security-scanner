@@ -6,7 +6,7 @@ import type { AiReviewInput, AiReviewOptions, AiReviewProvider } from "./types.j
 export const DEFAULT_AI_PROVIDER = "ollama";
 export const DEFAULT_AI_MODEL = "qwen3:1.7b";
 export const DEFAULT_AI_ENDPOINT = "http://localhost:11434";
-export const DEFAULT_AI_TIMEOUT_MS = 30000;
+export const DEFAULT_AI_TIMEOUT_MS = 120000;
 
 export function createAiReviewProvider(options: AiReviewOptions): AiReviewProvider {
   if (options.provider === "mock") {

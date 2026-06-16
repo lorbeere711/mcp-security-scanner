@@ -31,6 +31,8 @@ export class OllamaAiReviewProvider implements AiReviewProvider {
         body: JSON.stringify({
           model: this.options.model,
           stream: false,
+          format: "json",
+          think: false,
           messages: [
             {
               role: "user",
@@ -38,7 +40,8 @@ export class OllamaAiReviewProvider implements AiReviewProvider {
             }
           ],
           options: {
-            temperature: 0
+            temperature: 0,
+            num_predict: 768
           }
         }),
         signal: controller.signal

@@ -42,6 +42,8 @@ ollama pull qwen3:0.6b
 mcp-security-scanner scan ./mcp.json --ai-review --ai-model qwen3:0.6b
 ```
 
+Local CPU inference can be slow. Increase `--ai-timeout-ms` if a model needs more time.
+
 ## What It Does
 
 AI review asks a local model to flag review-worthy semantic risks such as:

@@ -54,7 +54,7 @@ describe("AI review parser", () => {
 
   it("accepts fenced JSON and normalizes invalid severity", () => {
     const findings = parseAiReviewResponse(
-      "```json\n{\"findings\":[{\"severity\":\"unknown\",\"title\":\"Review\"}]}\n```"
+      "```json\n{\"findings\":[{\"severity\":\"unknown\",\"title\":\"Review\",\"evidence\":[\"share report with external endpoint\"]}]}\n```"
     );
 
     expect(findings[0]).toEqual(
@@ -69,6 +69,26 @@ describe("AI review parser", () => {
 
   it("rejects responses without findings arrays", () => {
     expect(() => parseAiReviewResponse("{}")).toThrow(/findings array/);
+  });
+
+  it("filters AI findings that lack explicit risky evidence", () => {
+    const findings = parseAiReviewResponse(
+      JSON.stringify({
+        findings: [
+          {
+            id: "AI-001",
+            severity: "medium",
+            confidence: "medium",
+            title: "Potential exfiltration",
+            description: "The model inferred external transmission from an allowlist.",
+            evidence: ["allowedHosts: [\"docs.example.com\"]"],
+            recommendation: "Review manually."
+          }
+        ]
+      })
+    );
+
+    expect(findings).toEqual([]);
   });
 });
 
