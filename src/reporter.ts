@@ -1,5 +1,4 @@
 import type { Finding, ScanResult } from "./types.js";
-import { SCHEMA_VERSION } from "./index.js";
 
 // JsonReport is ScanResult with the schemaVersion field (now part of ScanResult itself).
 // Kept as a named type for documentation clarity.
