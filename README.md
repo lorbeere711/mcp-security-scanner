@@ -71,6 +71,7 @@ mcp-security-scanner scan --server @modelcontextprotocol/server-filesystem
 mcp-security-scanner audit ./mcp-server-config.json --format sarif
 mcp-security-scanner scan ./mcp-server-config.json --format json
 mcp-security-scanner scan ./mcp-server-config.json --format sarif --output report.sarif
+mcp-security-scanner scan ./mcp-server-config.json --ai-review
 ```
 
 Formats:
@@ -78,6 +79,14 @@ Formats:
 - `text`: human-readable report (default)
 - `json`: machine-readable full scan result (see [JSON Schema](#json-schema))
 - `sarif`: SARIF 2.1.0 report for code scanning tools
+
+Experimental local AI review:
+
+- `--ai-review`: run optional semantic review with a local model
+- `--ai-provider ollama`: use Ollama at `http://localhost:11434`
+- `--ai-model qwen3:1.7b`: default local model
+
+AI review is opt-in and never runs during default scans. See [docs/AI_REVIEW.md](docs/AI_REVIEW.md).
 
 ### JSON Schema
 
@@ -120,6 +129,9 @@ Each `Finding` object:
 | `description` | `string` | Detailed explanation |
 | `recommendation` | `string` | Actionable remediation text |
 | `path` | `string \| undefined` | Optional JSON path to the risky config key |
+| `source` | `"deterministic" \| "ai" \| undefined` | Finding source, present for AI findings |
+| `confidence` | `"low" \| "medium" \| "high" \| undefined` | Confidence level for AI findings |
+| `evidence` | `string[] \| undefined` | Evidence snippets for AI findings |
 
 Example output:
 

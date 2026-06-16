@@ -53,6 +53,15 @@ export function formatReport(result: ScanResult): string {
     if (f.path) {
       lines.push(`   Path: ${f.path}`);
     }
+    if (f.source) {
+      lines.push(`   Source: ${f.source}`);
+    }
+    if (f.confidence) {
+      lines.push(`   Confidence: ${f.confidence}`);
+    }
+    if (f.evidence && f.evidence.length > 0) {
+      lines.push(`   Evidence: ${f.evidence.join(" | ")}`);
+    }
     lines.push("");
   });
 

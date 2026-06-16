@@ -7,6 +7,9 @@ export interface Finding {
   description: string;
   recommendation: string;
   path?: string;
+  source?: "deterministic" | "ai";
+  confidence?: "low" | "medium" | "high";
+  evidence?: string[];
 }
 
 export interface ScanResult {
