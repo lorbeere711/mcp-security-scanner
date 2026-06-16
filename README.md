@@ -86,7 +86,15 @@ Experimental local AI review:
 - `--ai-provider ollama`: use Ollama at `http://localhost:11434`
 - `--ai-model qwen3:1.7b`: default local model
 
-AI review is opt-in and never runs during default scans. See [docs/AI_REVIEW.md](docs/AI_REVIEW.md).
+AI review is local-first, opt-in, and never runs during default scans. The scanner does not bundle a model or require an API key; users run their own local Ollama model.
+
+```bash
+ollama serve
+ollama pull qwen3:1.7b
+mcp-security-scanner scan ./mcp-server-config.json --ai-review
+```
+
+For slower machines or CI smoke tests, use `qwen3:0.6b`. See [docs/AI_REVIEW.md](docs/AI_REVIEW.md).
 
 ### JSON Schema
 
