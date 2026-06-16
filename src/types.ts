@@ -10,6 +10,7 @@ export interface Finding {
 }
 
 export interface ScanResult {
+  schemaVersion: string;
   target: string;
   findings: Finding[];
   scannedAt: string;

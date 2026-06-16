@@ -1,8 +1,8 @@
 import type { Finding, ScanResult } from "./types.js";
 
-interface JsonReport extends ScanResult {
-  schemaVersion: string;
-}
+// JsonReport is ScanResult with the schemaVersion field (now part of ScanResult itself).
+// Kept as a named type for documentation clarity.
+type JsonReport = ScanResult;
 
 const severityWeight: Record<Finding["severity"], number> = {
   low: 1,
@@ -78,7 +78,6 @@ export function riskBand(score: number): "LOW" | "MED" | "HIGH" {
 
 export function formatJsonReport(result: ScanResult): string {
   const report: JsonReport = {
-    schemaVersion: "1.0.0",
     ...result
   };
 

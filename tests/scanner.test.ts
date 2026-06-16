@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { scanMcpConfig } from "../src/index.js";
+import { scanMcpConfig, SCHEMA_VERSION } from "../src/index.js";
 
 const fixtureSecretPattern =
   /(sk-[A-Za-z0-9]{16,}|gh[pousr]_[A-Za-z0-9_]{16,}|xox[baprs]-[A-Za-z0-9-]+|AKIA[0-9A-Z]{16})/;
@@ -39,6 +39,16 @@ describe("scanMcpConfig", () => {
     });
 
     expect(result.findings.length).toBe(0);
+  });
+
+  it("includes schemaVersion in result", () => {
+    const result = scanMcpConfig("test.json", {
+      permissions: [],
+      name: "test-server",
+      license: "MIT"
+    });
+
+    expect(result.schemaVersion).toBe(SCHEMA_VERSION);
   });
 
   it("keeps the sanitized safe fixture clean", () => {

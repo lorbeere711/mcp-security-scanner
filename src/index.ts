@@ -13,10 +13,13 @@ const scanners: Scanner[] = [
   scanMetadata
 ];
 
+export const SCHEMA_VERSION = "1.0.0";
+
 export function scanMcpConfig(target: string, config: unknown): ScanResult {
   const findings = scanners.flatMap((scanner) => scanner({ rawConfig: config }));
 
   return {
+    schemaVersion: SCHEMA_VERSION,
     target,
     findings,
     scannedAt: new Date().toISOString()
