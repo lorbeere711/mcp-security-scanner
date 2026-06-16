@@ -1,0 +1,17 @@
+{
+  "name": "sanitized-filesystem-docs-server",
+  "license": "MIT",
+  "source": "sanitized example based on common desktop filesystem server configs",
+  "permissions": ["filesystem:read"],
+  "allowedPaths": ["/workspace/docs", "/workspace/notes"],
+  "tools": [
+    {
+      "name": "workspace_search",
+      "description": "Search approved workspace documents with schema validation."
+    },
+    {
+      "name": "document_lookup",
+      "description": "Return approved documentation snippets from configured workspace roots."
+    }
+  ]
+}

@@ -7,6 +7,10 @@ import {
 import { SCHEMA_VERSION } from "../src/index.js";
 import type { ScanResult, Finding } from "../src/types.js";
 
+interface JsonReport extends ScanResult {
+  schemaVersion: string;
+}
+
 const sampleResult: ScanResult = {
   schemaVersion: "1.0.0",
   target: "examples/insecure.json",
@@ -23,6 +27,21 @@ const sampleResult: ScanResult = {
   ]
 };
 
+const sampleResultWithoutPath: ScanResult = {
+  schemaVersion: "1.0.0",
+  target: "examples/insecure.json",
+  scannedAt: "2026-06-13T00:00:00.000Z",
+  findings: [
+    {
+      id: "PERM-001",
+      severity: "high",
+      title: "Dangerous permission detected",
+      description: "Permission shell can enable high-impact actions.",
+      recommendation: "Apply least-privilege."
+    }
+  ]
+};
+
 describe("reporters", () => {
   it("renders text report", () => {
     const text = formatReport(sampleResult);
@@ -35,7 +54,35 @@ describe("reporters", () => {
     const parsed = JSON.parse(json) as ScanResult;
     expect(parsed.schemaVersion).toBe("1.0.0");
     expect(parsed.target).toBe("examples/insecure.json");
+    expect(parsed.scannedAt).toBe("2026-06-13T00:00:00.000Z");
+    expect(Object.keys(parsed).sort()).toEqual([
+      "findings",
+      "scannedAt",
+      "schemaVersion",
+      "target"
+    ]);
     expect(parsed.findings.length).toBe(1);
+    const findingKeys = Object.keys(parsed.findings[0] ?? {}).sort();
+    expect([
+      ["description", "id", "recommendation", "severity", "title"],
+      ["description", "id", "path", "recommendation", "severity", "title"]
+    ]).toContainEqual(findingKeys);
+  });
+
+  it("renders json report for finding without path", () => {
+    const json = formatJsonReport(sampleResultWithoutPath);
+    const parsed = JSON.parse(json) as JsonReport;
+
+    expect(parsed.schemaVersion).toBe("1.0.0");
+    expect(parsed.findings.length).toBe(1);
+    const findingKeys = Object.keys(parsed.findings[0] ?? {}).sort();
+    expect(findingKeys).toEqual([
+      "description",
+      "id",
+      "recommendation",
+      "severity",
+      "title"
+    ]);
   });
 
   it("renders sarif report", () => {

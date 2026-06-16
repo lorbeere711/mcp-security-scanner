@@ -83,11 +83,11 @@ Formats:
 
 The JSON report includes a `schemaVersion` field so consumers can validate compatibility.
 
-```jsonc
+```json
 {
   "schemaVersion": "1.0.0",
-  "target": "./mcp-server-config.json",
-  "scannedAt": "2026-06-14T00:00:00.000Z",
+  "target": "examples/insecure.json",
+  "scannedAt": "2026-06-13T00:00:00.000Z",
   "findings": [
     {
       "id": "PERM-001",
@@ -104,7 +104,7 @@ The JSON report includes a `schemaVersion` field so consumers can validate compa
 **Fields:**
 
 | Field | Type | Description |
-|-------|------|-------------|
+| --- | --- | --- |
 | `schemaVersion` | `string` | Semantic version of the report schema (e.g. `"1.0.0"`) |
 | `target` | `string` | Path or package name of the scanned MCP config |
 | `scannedAt` | `string` | ISO 8601 timestamp of the scan |
@@ -113,7 +113,7 @@ The JSON report includes a `schemaVersion` field so consumers can validate compa
 Each `Finding` object:
 
 | Field | Type | Description |
-|-------|------|-------------|
+| --- | --- | --- |
 | `id` | `string` | Unique finding identifier (e.g. `PERM-001`) |
 | `severity` | `"low" \| "medium" \| "high" \| "critical"` | Risk level |
 | `title` | `string` | Short description of the finding |
@@ -144,6 +144,41 @@ npm run test
 npm run build
 npm run pack:check
 ```
+
+## Adversarial Fixture Benchmarks
+
+This repository includes adversarial benchmark fixtures under [examples/fixtures/](examples/fixtures/) to make deterministic scanner behavior explicit.
+
+- Safe fixtures live in [examples/fixtures/safe/](examples/fixtures/safe/)
+- Unsafe fixtures live in [examples/fixtures/unsafe/](examples/fixtures/unsafe/)
+- Expected outcomes are tracked in [examples/fixtures/manifest.json](examples/fixtures/manifest.json)
+
+Each manifest entry includes:
+
+- `expectedFindingIds`: findings that must be present for the fixture
+- `mustMissFindingIds`: findings intentionally expected to be absent (known false negatives)
+- `notes`: rationale for why the fixture exists
+
+Run fixture benchmarks with:
+
+```bash
+npm run test
+```
+
+### Known Limitation: Natural-Language Exfiltration Intent
+
+The scanner is deterministic and keyword-driven in several rules. This means natural-language descriptions can imply risky behavior without matching current keyword patterns.
+
+Example: a tool description that says it will "share diagnostics with a configured service endpoint" may represent exfiltration intent but may not currently trigger `EXFIL-001`.
+
+This limitation is tracked explicitly in the adversarial fixture suite as a known false negative, so misses are visible and regression-tested instead of hidden.
+
+### Adding New Benchmark Fixtures
+
+1. Add the fixture JSON file to the appropriate folder under [examples/fixtures/](examples/fixtures/).
+2. Add or update the corresponding entry in [examples/fixtures/manifest.json](examples/fixtures/manifest.json).
+3. Keep fixture metadata focused on finding IDs (`expectedFindingIds` and `mustMissFindingIds`) to avoid brittle tests.
+4. Run `npm run test` and confirm behavior is explicit for both expected detections and known misses.
 
 ## GitHub Action
 

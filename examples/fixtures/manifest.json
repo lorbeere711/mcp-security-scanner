@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtures": [
+    {
+      "id": "unsafe-obvious-exfil",
+      "path": "unsafe/obvious-exfil.json",
+      "classification": "unsafe",
+      "expectedFindingIds": ["PERM-001", "PERM-003", "EXFIL-001"],
+      "mustMissFindingIds": [],
+      "notes": "Baseline unsafe case with explicit external upload behavior and sensitive credentials."
+    },
+    {
+      "id": "unsafe-prompt-injection",
+      "path": "unsafe/prompt-injection.json",
+      "classification": "unsafe",
+      "expectedFindingIds": ["PROMPT-001"],
+      "mustMissFindingIds": [],
+      "notes": "Baseline unsafe case for direct prompt-injection markers."
+    },
+    {
+      "id": "unsafe-natural-language-exfil-known-fn",
+      "path": "unsafe/natural-language-exfil-known-fn.json",
+      "classification": "unsafe",
+      "expectedFindingIds": [],
+      "mustMissFindingIds": ["EXFIL-001"],
+      "notes": "Known false negative: natural-language exfiltration intent without explicit exfiltration keywords."
+    },
+    {
+      "id": "unsafe-permissions-outside-standard-key-known-fn",
+      "path": "unsafe/permissions-outside-standard-key-known-fn.json",
+      "classification": "unsafe",
+      "expectedFindingIds": [],
+      "mustMissFindingIds": ["PERM-001"],
+      "notes": "Known false negative: dangerous capabilities are represented outside the expected permissions key."
+    },
+    {
+      "id": "unsafe-semantic-prompt-injection-known-fn",
+      "path": "unsafe/semantic-prompt-injection-known-fn.json",
+      "classification": "unsafe",
+      "expectedFindingIds": [],
+      "mustMissFindingIds": ["PROMPT-001"],
+      "notes": "Known false negative: semantic prompt override language misses current explicit jailbreak patterns."
+    },
+    {
+      "id": "unsafe-semantic-egress-cookies-known-fn",
+      "path": "unsafe/semantic-egress-cookies-known-fn.json",
+      "classification": "unsafe",
+      "expectedFindingIds": [],
+      "mustMissFindingIds": ["EXFIL-001"],
+      "notes": "Known false negative: sensitive session data egress intent without current exfiltration/sensitive keyword hits."
+    },
+    {
+      "id": "safe-strict-baseline",
+      "path": "safe/strict-baseline.json",
+      "classification": "safe",
+      "expectedFindingIds": [],
+      "mustMissFindingIds": [],
+      "notes": "Safe baseline with least-privilege permissions and constrained tool description."
+    },
+    {
+      "id": "safe-design-token-known-fp",
+      "path": "safe/design-token-known-fp.json",
+      "classification": "safe",
+      "expectedFindingIds": ["TOOLS-002"],
+      "mustMissFindingIds": [],
+      "notes": "Known false positive: benign use of the word token in tool naming/documentation."
+    }
+  ]
+}

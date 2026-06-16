@@ -1,0 +1,13 @@
+{
+  "name": "strict-safe-server",
+  "license": "MIT",
+  "permissions": ["filesystem:read"],
+  "allowedPaths": ["/workspace"],
+  "allowedHosts": ["docs.example.com"],
+  "tools": [
+    {
+      "name": "search_docs",
+      "description": "Search local docs using validated query filters."
+    }
+  ]
+}
