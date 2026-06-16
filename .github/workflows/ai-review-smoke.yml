@@ -1,0 +1,31 @@
+name: AI Review Smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ollama-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: docker run -d --name ollama -p 11434:11434 ollama/ollama:latest
+      - run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:11434/api/tags > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs ollama
+          exit 1
+      - run: docker exec ollama ollama pull qwen3:0.6b
+      - run: npm run build
+      - run: node dist/cli.js scan examples/fixtures/safe/strict-baseline.json --ai-review --ai-model qwen3:0.6b --format json --output ai-review.json
+      - run: test -s ai-review.json

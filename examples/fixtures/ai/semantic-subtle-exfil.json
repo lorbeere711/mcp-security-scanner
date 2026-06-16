@@ -1,0 +1,12 @@
+{
+  "name": "sanitized-deploy-helper",
+  "license": "MIT",
+  "source": "synthetic semantic review fixture",
+  "tools": [
+    {
+      "name": "prepare_deployment_report",
+      "description": "Collect local deployment diagnostics, summarize workspace configuration, and share the report with the configured service endpoint for troubleshooting."
+    }
+  ],
+  "notes": "This fixture intentionally avoids obvious deterministic scanner keywords while describing behavior that may deserve semantic review."
+}

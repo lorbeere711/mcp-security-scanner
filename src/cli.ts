@@ -12,6 +12,14 @@ import {
   type ReportFormat
 } from "./reporter.js";
 import { scanMcpConfig } from "./index.js";
+import {
+  DEFAULT_AI_ENDPOINT,
+  DEFAULT_AI_MODEL,
+  DEFAULT_AI_PROVIDER,
+  DEFAULT_AI_TIMEOUT_MS,
+  runAiReview
+} from "./ai/reviewer.js";
+import type { AiProviderName, AiReviewOptions } from "./ai/types.js";
 
 const program = new Command();
 const require = createRequire(import.meta.url);
@@ -34,18 +42,45 @@ function registerScanLikeCommand(name: string, description: string): void {
     .option("-s, --server <package>", "NPM package name of an MCP server")
     .option("-f, --format <format>", "Output format: text|json|sarif", "text")
     .option("-o, --output <file>", "Write report to file")
+    .option("--ai-review", "Run experimental local AI semantic review")
+    .option("--ai-provider <provider>", "AI provider: ollama|mock", DEFAULT_AI_PROVIDER)
+    .option("--ai-model <model>", "Local AI model name", DEFAULT_AI_MODEL)
+    .option("--ai-endpoint <url>", "Local AI provider endpoint", DEFAULT_AI_ENDPOINT)
+    .option("--ai-timeout-ms <ms>", "AI review timeout in milliseconds", String(DEFAULT_AI_TIMEOUT_MS))
     .action(
-      (
+      async (
         configPath: string | undefined,
         options: {
           server?: string;
           format: string;
           output?: string;
+          aiReview?: boolean;
+          aiProvider: string;
+          aiModel: string;
+          aiEndpoint: string;
+          aiTimeoutMs: string;
         }
       ) => {
         try {
           const input = loadTarget(configPath, options.server);
           const result = scanMcpConfig(input.target, input.config);
+
+          if (options.aiReview) {
+            try {
+              const findings = await runAiReview(
+                {
+                  target: input.target,
+                  config: input.config
+                },
+                parseAiReviewOptions(options)
+              );
+              result.findings.push(...findings);
+            } catch (error) {
+              const message = error instanceof Error ? error.message : String(error);
+              console.error(`Warning: AI review failed: ${message}`);
+            }
+          }
+
           const format = parseFormat(options.format);
           const output = renderByFormat(format, result);
 
@@ -68,6 +103,30 @@ function registerScanLikeCommand(name: string, description: string): void {
         }
       }
     );
+}
+
+function parseAiReviewOptions(options: {
+  aiProvider: string;
+  aiModel: string;
+  aiEndpoint: string;
+  aiTimeoutMs: string;
+}): AiReviewOptions {
+  const timeoutMs = Number.parseInt(options.aiTimeoutMs, 10);
+
+  return {
+    provider: parseAiProvider(options.aiProvider),
+    model: options.aiModel,
+    endpoint: options.aiEndpoint,
+    timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : DEFAULT_AI_TIMEOUT_MS
+  };
+}
+
+function parseAiProvider(input: string): AiProviderName {
+  if (input === "ollama" || input === "mock") {
+    return input;
+  }
+
+  throw new Error(`Unsupported AI provider: ${input}. Use ollama or mock.`);
 }
 
 function parseConfig(filePath: string, raw: string): unknown {
