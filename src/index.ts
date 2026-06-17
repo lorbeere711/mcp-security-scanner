@@ -1,4 +1,5 @@
 import { scanDataExfiltration } from "./scanners/dataExfiltration.js";
+import { scanFilesystemOverPermission } from "./scanners/filesystemOverPermission.js";
 import { scanMetadata } from "./scanners/metadata.js";
 import { scanPermissions } from "./scanners/permissions.js";
 import { scanPromptInjection } from "./scanners/promptInjection.js";
@@ -7,6 +8,7 @@ import type { ScanResult, Scanner } from "./types.js";
 
 const scanners: Scanner[] = [
   scanPermissions,
+  scanFilesystemOverPermission,
   scanPromptInjection,
   scanToolDescriptions,
   scanDataExfiltration,
