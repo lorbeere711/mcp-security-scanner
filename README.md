@@ -218,6 +218,7 @@ This limitation is tracked explicitly in the adversarial fixture suite as a know
   with:
     target: ./mcp.json
     format: sarif
+    fail-on: high
 ```
 
 Or scan a server package:
@@ -228,6 +229,23 @@ Or scan a server package:
     server: @modelcontextprotocol/server-filesystem
     format: sarif
     fail-on: critical
+```
+
+Post or update a PR summary comment:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: write
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: lorbeere711/mcp-security-scanner@v0
+    with:
+      target: ./mcp.json
+      format: sarif
+      fail-on: high
+      comment-pr: true
 ```
 
 ## Publish Preparation
