@@ -14,6 +14,10 @@ inputs:
     description: Report format (text|json|sarif)
     required: false
     default: sarif
+  fail-on:
+    description: Failure threshold (critical|high|medium|low|none)
+    required: false
+    default: high
 
 runs:
   using: composite
@@ -35,8 +39,8 @@ runs:
     - name: Run scanner
       run: |
         if [ -n "${{ inputs.server }}" ]; then
-          node dist/cli.js audit --server "${{ inputs.server }}" --format "${{ inputs.format }}"
+          node dist/cli.js audit --server "${{ inputs.server }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}"
         else
-          node dist/cli.js audit "${{ inputs.target }}" --format "${{ inputs.format }}"
+          node dist/cli.js audit "${{ inputs.target }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}"
         fi
       shell: bash

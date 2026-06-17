@@ -21,6 +21,7 @@ Add it to CI:
   with:
     target: ./mcp.json
     format: sarif
+    fail-on: high
 ```
 
 ## Positioning
@@ -226,6 +227,7 @@ Or scan a server package:
   with:
     server: @modelcontextprotocol/server-filesystem
     format: sarif
+    fail-on: critical
 ```
 
 ## Publish Preparation
