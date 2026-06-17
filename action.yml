@@ -2,6 +2,10 @@ name: mcp-security-scanner
 description: The npm-audit for MCP servers.
 author: lorbeere711
 
+branding:
+  icon: shield
+  color: red
+
 inputs:
   target:
     description: Path to MCP config file
@@ -14,6 +18,9 @@ inputs:
     description: Report format (text|json|sarif)
     required: false
     default: sarif
+  output:
+    description: Optional path to write the scanner report
+    required: false
   fail-on:
     description: Failure threshold (critical|high|medium|low|none)
     required: false
@@ -47,10 +54,15 @@ runs:
       id: scan
       run: |
         set +e
+        output_args=()
+        if [ -n "${{ inputs.output }}" ]; then
+          output_args=(--output "${{ inputs.output }}")
+        fi
+
         if [ -n "${{ inputs.server }}" ]; then
-          node "${GITHUB_ACTION_PATH}/dist/cli.js" audit --server "${{ inputs.server }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}"
+          node "${GITHUB_ACTION_PATH}/dist/cli.js" audit --server "${{ inputs.server }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}" "${output_args[@]}"
         else
-          node "${GITHUB_ACTION_PATH}/dist/cli.js" audit "${{ inputs.target }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}"
+          node "${GITHUB_ACTION_PATH}/dist/cli.js" audit "${{ inputs.target }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}" "${output_args[@]}"
         fi
         exit_code=$?
         echo "exit-code=${exit_code}" >> "${GITHUB_OUTPUT}"

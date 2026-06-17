@@ -213,6 +213,33 @@ This limitation is tracked explicitly in the adversarial fixture suite as a know
 
 ## GitHub Action
 
+Full pull request workflow:
+
+```yaml
+name: MCP Security Scan
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  mcp-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lorbeere711/mcp-security-scanner@v0
+        with:
+          target: ./mcp.json
+          format: sarif
+          fail-on: high
+          comment-pr: true
+```
+
 ```yaml
 - uses: lorbeere711/mcp-security-scanner@v0
   with:
@@ -246,6 +273,29 @@ steps:
       format: sarif
       fail-on: high
       comment-pr: true
+```
+
+Upload SARIF to GitHub code scanning:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: lorbeere711/mcp-security-scanner@v0
+    with:
+      target: ./mcp.json
+      format: sarif
+      output: mcp-security.sarif
+      fail-on: high
+      comment-pr: true
+  - uses: github/codeql-action/upload-sarif@v3
+    if: always()
+    with:
+      sarif_file: mcp-security.sarif
 ```
 
 ## Publish Preparation
