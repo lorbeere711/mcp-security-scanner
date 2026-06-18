@@ -2,6 +2,10 @@ name: mcp-security-scanner
 description: The npm-audit for MCP servers.
 author: lorbeere711
 
+branding:
+  icon: shield
+  color: red
+
 inputs:
   target:
     description: Path to MCP config file
@@ -14,6 +18,17 @@ inputs:
     description: Report format (text|json|sarif)
     required: false
     default: sarif
+  output:
+    description: Optional path to write the scanner report
+    required: false
+  fail-on:
+    description: Failure threshold (critical|high|medium|low|none)
+    required: false
+    default: high
+  comment-pr:
+    description: Post or update a pull request summary comment
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -23,20 +38,90 @@ runs:
       with:
         node-version: 20
         cache: npm
+        cache-dependency-path: ${{ github.action_path }}/package-lock.json
 
     - name: Install dependencies
       run: npm ci
       shell: bash
+      working-directory: ${{ github.action_path }}
 
     - name: Build CLI
       run: npm run build
       shell: bash
+      working-directory: ${{ github.action_path }}
 
     - name: Run scanner
+      id: scan
       run: |
-        if [ -n "${{ inputs.server }}" ]; then
-          node dist/cli.js audit --server "${{ inputs.server }}" --format "${{ inputs.format }}"
-        else
-          node dist/cli.js audit "${{ inputs.target }}" --format "${{ inputs.format }}"
+        set +e
+        output_args=()
+        if [ -n "${{ inputs.output }}" ]; then
+          output_args=(--output "${{ inputs.output }}")
         fi
+
+        if [ -n "${{ inputs.server }}" ]; then
+          node "${GITHUB_ACTION_PATH}/dist/cli.js" audit --server "${{ inputs.server }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}" "${output_args[@]}"
+        else
+          node "${GITHUB_ACTION_PATH}/dist/cli.js" audit "${{ inputs.target }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}" "${output_args[@]}"
+        fi
+        exit_code=$?
+        echo "exit-code=${exit_code}" >> "${GITHUB_OUTPUT}"
+        exit 0
+      shell: bash
+
+    - name: Generate PR comment report
+      if: ${{ inputs.comment-pr == 'true' && github.event_name == 'pull_request' }}
+      run: |
+        mkdir -p "${RUNNER_TEMP}/mcp-security-scanner"
+        if [ -n "${{ inputs.server }}" ]; then
+          node "${GITHUB_ACTION_PATH}/dist/cli.js" audit --server "${{ inputs.server }}" --format json --output "${RUNNER_TEMP}/mcp-security-scanner/report.json" --fail-on none
+        else
+          node "${GITHUB_ACTION_PATH}/dist/cli.js" audit "${{ inputs.target }}" --format json --output "${RUNNER_TEMP}/mcp-security-scanner/report.json" --fail-on none
+        fi
+        node "${GITHUB_ACTION_PATH}/scripts/format-pr-comment.mjs" "${RUNNER_TEMP}/mcp-security-scanner/report.json" "${RUNNER_TEMP}/mcp-security-scanner/comment.md"
+      shell: bash
+
+    - name: Post PR summary comment
+      if: ${{ inputs.comment-pr == 'true' && github.event_name == 'pull_request' }}
+      uses: actions/github-script@v7
+      env:
+        COMMENT_FILE: ${{ runner.temp }}/mcp-security-scanner/comment.md
+      with:
+        script: |
+          const fs = require("fs");
+
+          const marker = "<!-- mcp-security-scanner-pr-comment -->";
+          const body = fs.readFileSync(process.env.COMMENT_FILE, "utf8");
+          const { owner, repo } = context.repo;
+          const issue_number = context.payload.pull_request.number;
+
+          const comments = await github.rest.issues.listComments({
+            owner,
+            repo,
+            issue_number,
+            per_page: 100
+          });
+
+          const previous = comments.data.find((comment) =>
+            comment.user?.type === "Bot" && comment.body?.includes(marker)
+          );
+
+          if (previous) {
+            await github.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: previous.id,
+              body
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body
+            });
+          }
+
+    - name: Enforce fail threshold
+      run: exit "${{ steps.scan.outputs.exit-code }}"
       shell: bash

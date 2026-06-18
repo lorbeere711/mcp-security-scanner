@@ -21,6 +21,7 @@ Add it to CI:
   with:
     target: ./mcp.json
     format: sarif
+    fail-on: high
 ```
 
 ## Positioning
@@ -72,6 +73,8 @@ mcp-security-scanner audit ./mcp-server-config.json --format sarif
 mcp-security-scanner scan ./mcp-server-config.json --format json
 mcp-security-scanner scan ./mcp-server-config.json --format markdown
 mcp-security-scanner scan ./mcp-server-config.json --format sarif --output report.sarif
+mcp-security-scanner scan ./mcp-server-config.json --fail-on critical
+mcp-security-scanner scan ./mcp-server-config.json --fail-on none
 mcp-security-scanner scan ./mcp-server-config.json --ai-review
 ```
 
@@ -81,6 +84,14 @@ Formats:
 - `json`: machine-readable full scan result (see [JSON Schema](#json-schema))
 - `markdown`: paste-ready report for PR comments, issue notes, and audit summaries
 - `sarif`: SARIF 2.1.0 report for code scanning tools
+
+CI failure threshold:
+
+- `--fail-on critical`: fail only on critical findings
+- `--fail-on high`: fail on high or critical findings (default)
+- `--fail-on medium`: fail on medium, high, or critical findings
+- `--fail-on low`: fail on any finding
+- `--fail-on none`: report-only mode, never fail because of findings
 
 Experimental local AI review:
 
@@ -153,9 +164,9 @@ LOW   missing server metadata / license
 
 Exit codes:
 
-- `0`: no high or critical findings
+- `0`: no findings at or above the configured `--fail-on` threshold
 - `1`: scanner/runtime error
-- `2`: high or critical findings detected
+- `2`: findings detected at or above the configured `--fail-on` threshold
 
 ## Development
 
@@ -204,11 +215,39 @@ This limitation is tracked explicitly in the adversarial fixture suite as a know
 
 ## GitHub Action
 
+Full pull request workflow:
+
+```yaml
+name: MCP Security Scan
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  mcp-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lorbeere711/mcp-security-scanner@v0
+        with:
+          target: ./mcp.json
+          format: sarif
+          fail-on: high
+          comment-pr: true
+```
+
 ```yaml
 - uses: lorbeere711/mcp-security-scanner@v0
   with:
     target: ./mcp.json
     format: sarif
+    fail-on: high
 ```
 
 Or scan a server package:
@@ -218,6 +257,47 @@ Or scan a server package:
   with:
     server: @modelcontextprotocol/server-filesystem
     format: sarif
+    fail-on: critical
+```
+
+Post or update a PR summary comment:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: write
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: lorbeere711/mcp-security-scanner@v0
+    with:
+      target: ./mcp.json
+      format: sarif
+      fail-on: high
+      comment-pr: true
+```
+
+Upload SARIF to GitHub code scanning:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: lorbeere711/mcp-security-scanner@v0
+    with:
+      target: ./mcp.json
+      format: sarif
+      output: mcp-security.sarif
+      fail-on: high
+      comment-pr: true
+  - uses: github/codeql-action/upload-sarif@v3
+    if: always()
+    with:
+      sarif_file: mcp-security.sarif
 ```
 
 ## Publish Preparation
