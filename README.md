@@ -71,6 +71,7 @@ mcp-security-scanner scan ./mcp-server-config.yaml
 mcp-security-scanner scan --server @modelcontextprotocol/server-filesystem
 mcp-security-scanner audit ./mcp-server-config.json --format sarif
 mcp-security-scanner scan ./mcp-server-config.json --format json
+mcp-security-scanner scan ./mcp-server-config.json --format markdown
 mcp-security-scanner scan ./mcp-server-config.json --format sarif --output report.sarif
 mcp-security-scanner scan ./mcp-server-config.json --fail-on critical
 mcp-security-scanner scan ./mcp-server-config.json --fail-on none
@@ -81,6 +82,7 @@ Formats:
 
 - `text`: human-readable report (default)
 - `json`: machine-readable full scan result (see [JSON Schema](#json-schema))
+- `markdown`: paste-ready report for PR comments, issue notes, and audit summaries
 - `sarif`: SARIF 2.1.0 report for code scanning tools
 
 CI failure threshold:

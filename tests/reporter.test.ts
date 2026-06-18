@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   formatJsonReport,
+  formatMarkdownReport,
   formatReport,
   formatSarifReport
 } from "../src/reporter.js";
@@ -38,6 +39,33 @@ const sampleResultWithoutPath: ScanResult = {
       title: "Dangerous permission detected",
       description: "Permission shell can enable high-impact actions.",
       recommendation: "Apply least-privilege."
+    }
+  ]
+};
+
+const sampleResultWithAiMetadata: ScanResult = {
+  schemaVersion: "1.0.0",
+  target: "examples/insecure.json",
+  scannedAt: "2026-06-13T00:00:00.000Z",
+  findings: [
+    {
+      id: "AI-001",
+      severity: "medium",
+      title: "Suspicious tool description",
+      description: "The tool may encourage unsafe agent behavior.",
+      recommendation: "Constrain the tool description and add an allowlist.",
+      path: "tools[0].description",
+      source: "ai",
+      confidence: "high",
+      evidence: ["mentions arbitrary shell access", "asks agent to ignore policy"]
+    },
+    {
+      id: "PERM-001",
+      severity: "high",
+      title: "Dangerous permission detected",
+      description: "Permission shell can enable high-impact actions.",
+      recommendation: "Apply least-privilege.",
+      path: "permissions"
     }
   ]
 };
@@ -94,6 +122,63 @@ describe("reporters", () => {
 
     expect(parsed.version).toBe("2.1.0");
     expect(parsed.runs[0]?.results[0]?.ruleId).toBe("PERM-001");
+  });
+
+  it("renders markdown report with severity counts and AI metadata", () => {
+    const markdown = formatMarkdownReport(sampleResultWithAiMetadata);
+
+    expect(markdown).toContain("# MCP Security Scan Report");
+    expect(markdown).toContain("Target: `examples/insecure.json`");
+    expect(markdown).toContain("| high | 1 |");
+    expect(markdown).toContain("| medium | 1 |");
+    expect(markdown).toContain(
+      "| medium | AI-001 | Suspicious tool description | The tool may encourage unsafe agent behavior. | tools[0].description | Constrain the tool description and add an allowlist. | ai | high | mentions arbitrary shell access; asks agent to ignore policy |"
+    );
+  });
+
+  it("keeps duplicate markdown findings distinguishable by description", () => {
+    const markdown = formatMarkdownReport({
+      schemaVersion: SCHEMA_VERSION,
+      target: "examples/insecure.json",
+      scannedAt: "2026-06-14T00:00:00.000Z",
+      findings: [
+        {
+          id: "PERM-001",
+          severity: "high",
+          title: "Dangerous permission detected",
+          description: "Permission shell can enable high-impact actions.",
+          recommendation: "Apply least-privilege.",
+          path: "permissions"
+        },
+        {
+          id: "PERM-001",
+          severity: "high",
+          title: "Dangerous permission detected",
+          description: "Permission filesystem:all can enable high-impact actions.",
+          recommendation: "Apply least-privilege.",
+          path: "permissions"
+        }
+      ]
+    });
+
+    expect(markdown).toContain(
+      "| high | PERM-001 | Dangerous permission detected | Permission shell can enable high-impact actions. | permissions | Apply least-privilege. | - | - | - |"
+    );
+    expect(markdown).toContain(
+      "| high | PERM-001 | Dangerous permission detected | Permission filesystem:all can enable high-impact actions. | permissions | Apply least-privilege. | - | - | - |"
+    );
+  });
+
+  it("renders markdown report for empty findings", () => {
+    const markdown = formatMarkdownReport({
+      schemaVersion: SCHEMA_VERSION,
+      target: "safe.json",
+      scannedAt: "2026-06-14T00:00:00.000Z",
+      findings: []
+    });
+
+    expect(markdown).toContain("| critical | 0 |");
+    expect(markdown).toContain("No findings detected.");
   });
 });
 

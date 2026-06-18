@@ -7,6 +7,7 @@ import path from "node:path";
 import yaml from "js-yaml";
 import {
   formatJsonReport,
+  formatMarkdownReport,
   formatReport,
   formatSarifReport,
   type ReportFormat
@@ -45,7 +46,7 @@ function registerScanLikeCommand(name: string, description: string): void {
     .description(description)
     .argument("[configPath]", "Path to MCP config (JSON or YAML)")
     .option("-s, --server <package>", "NPM package name of an MCP server")
-    .option("-f, --format <format>", "Output format: text|json|sarif", "text")
+    .option("-f, --format <format>", "Output format: text|json|sarif|markdown", "text")
     .option("-o, --output <file>", "Write report to file")
     .option(
       "--fail-on <severity>",
@@ -222,11 +223,11 @@ function loadEmbeddedConfig(packageDir: string): Record<string, unknown> {
 }
 
 function parseFormat(input: string): ReportFormat {
-  if (input === "text" || input === "json" || input === "sarif") {
+  if (input === "text" || input === "json" || input === "sarif" || input === "markdown") {
     return input;
   }
 
-  throw new Error(`Unsupported format: ${input}. Use text, json, or sarif.`);
+  throw new Error(`Unsupported format: ${input}. Use text, json, sarif, or markdown.`);
 }
 
 function renderByFormat(format: ReportFormat, result: ReturnType<typeof scanMcpConfig>): string {
@@ -236,6 +237,10 @@ function renderByFormat(format: ReportFormat, result: ReturnType<typeof scanMcpC
 
   if (format === "sarif") {
     return formatSarifReport(result);
+  }
+
+  if (format === "markdown") {
+    return formatMarkdownReport(result);
   }
 
   return formatReport(result);
