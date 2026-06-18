@@ -132,7 +132,40 @@ describe("reporters", () => {
     expect(markdown).toContain("| high | 1 |");
     expect(markdown).toContain("| medium | 1 |");
     expect(markdown).toContain(
-      "| medium | AI-001 | Suspicious tool description | tools[0].description | Constrain the tool description and add an allowlist. | ai | high | mentions arbitrary shell access; asks agent to ignore policy |"
+      "| medium | AI-001 | Suspicious tool description | The tool may encourage unsafe agent behavior. | tools[0].description | Constrain the tool description and add an allowlist. | ai | high | mentions arbitrary shell access; asks agent to ignore policy |"
+    );
+  });
+
+  it("keeps duplicate markdown findings distinguishable by description", () => {
+    const markdown = formatMarkdownReport({
+      schemaVersion: SCHEMA_VERSION,
+      target: "examples/insecure.json",
+      scannedAt: "2026-06-14T00:00:00.000Z",
+      findings: [
+        {
+          id: "PERM-001",
+          severity: "high",
+          title: "Dangerous permission detected",
+          description: "Permission shell can enable high-impact actions.",
+          recommendation: "Apply least-privilege.",
+          path: "permissions"
+        },
+        {
+          id: "PERM-001",
+          severity: "high",
+          title: "Dangerous permission detected",
+          description: "Permission filesystem:all can enable high-impact actions.",
+          recommendation: "Apply least-privilege.",
+          path: "permissions"
+        }
+      ]
+    });
+
+    expect(markdown).toContain(
+      "| high | PERM-001 | Dangerous permission detected | Permission shell can enable high-impact actions. | permissions | Apply least-privilege. | - | - | - |"
+    );
+    expect(markdown).toContain(
+      "| high | PERM-001 | Dangerous permission detected | Permission filesystem:all can enable high-impact actions. | permissions | Apply least-privilege. | - | - | - |"
     );
   });
 

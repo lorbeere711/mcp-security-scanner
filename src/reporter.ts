@@ -127,8 +127,8 @@ export function formatMarkdownReport(result: ScanResult): string {
   lines.push(
     "## Findings",
     "",
-    "| Severity | ID | Finding | Path | Recommendation | Source | Confidence | Evidence |",
-    "| --- | --- | --- | --- | --- | --- | --- | --- |"
+    "| Severity | ID | Finding | Description | Path | Recommendation | Source | Confidence | Evidence |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
   );
 
   sorted.forEach((finding) => {
@@ -137,6 +137,7 @@ export function formatMarkdownReport(result: ScanResult): string {
         finding.severity,
         finding.id,
         finding.title,
+        finding.description,
         finding.path ?? "-",
         finding.recommendation,
         finding.source ?? "-",
