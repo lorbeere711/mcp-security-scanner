@@ -36,13 +36,30 @@ This project is intentionally different from runtime sandboxing and broad resear
 
 ## What It Scans (MVP 0.1)
 
-- Dangerous permissions
-- Prompt injection indicators
-- Unsafe tool descriptions
-- Potential data exfiltration paths
-- Missing metadata signals (name/license)
-- Broad filesystem/network permissions without allowlists
+- Dangerous permissions (`PERM-001`)
+- Broad filesystem permissions without allowlists (`FS-001`, `FS-002`)
+- Prompt injection indicators (`PROMPT-001`, `PROMPT-002`)
+- Unsafe tool descriptions (`TOOLS-001`, `TOOLS-002`)
+- Potential data exfiltration paths (`EXFIL-001`)
+- Missing metadata signals (`META-001`)
+- Broad network permissions without host allowlists (`PERM-003`)
 - Risk score (`0-100`) with severity-oriented report output
+
+## Detectors
+
+| ID | Severity | Description |
+| --- | --- | --- |
+| `PERM-001` | high | Dangerous permission detected (shell, exec, sudo, etc.) |
+| `PERM-002` | high | Broad filesystem permission without path allowlist |
+| `PERM-003` | medium | Broad network permission without host allowlist |
+| `FS-001` | high | Broad filesystem permission (filesystem:all / filesystem:write) without path allowlist |
+| `FS-002` | medium | Filesystem read access without path allowlist |
+| `PROMPT-001` | critical | Prompt injection indicator found |
+| `PROMPT-002` | high | Untrusted content flow into prompts |
+| `TOOLS-001` | medium | Unsafe tool description |
+| `TOOLS-002` | low | Tool description suggests external data access |
+| `EXFIL-001` | critical | Potential sensitive data exfiltration path |
+| `META-001` | low | Missing server metadata (name / license) |
 
 ## Why
 
@@ -311,7 +328,6 @@ If checks pass, publish from a trusted environment with npm credentials configur
 
 ## Contribution Ideas
 
-- good first issue: add detector for filesystem over-permission
 - good first issue: add JSON output enhancements and stable schema docs
 - help wanted: improve SARIF mapping for GitHub code scanning UX
 - help wanted: add MCP server registry scanner support
