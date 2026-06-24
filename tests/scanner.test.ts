@@ -51,6 +51,49 @@ describe("scanMcpConfig", () => {
     expect(result.schemaVersion).toBe(SCHEMA_VERSION);
   });
 
+  it("flags arbitrary URL tools without a domain allowlist", () => {
+    const result = scanMcpConfig("network-tool.json", {
+      permissions: ["network"],
+      name: "network-server",
+      license: "MIT",
+      tools: [
+        {
+          name: "fetch_url",
+          description: "Fetch any URL and return the response body."
+        }
+      ]
+    });
+
+    const finding = result.findings.find((f) => f.id === "NET-001");
+
+    expect(finding).toBeDefined();
+    expect(finding?.severity).toBe("medium");
+    expect(finding?.path).toBe("tools.fetch_url");
+  });
+
+  it("downgrades network tool severity when a domain allowlist exists", () => {
+    const result = scanMcpConfig("allowlisted-network-tool.json", {
+      permissions: ["network"],
+      name: "allowlisted-network-server",
+      license: "MIT",
+      network: {
+        allowedDomains: ["api.example.com"]
+      },
+      tools: [
+        {
+          name: "fetch_url",
+          description: "Fetch URLs and reject hosts outside the approved domain list."
+        }
+      ]
+    });
+
+    const finding = result.findings.find((f) => f.id === "NET-001");
+
+    expect(finding).toBeDefined();
+    expect(finding?.severity).toBe("low");
+    expect(result.findings.some((f) => f.id === "PERM-003")).toBe(false);
+  });
+
   it("keeps the sanitized safe fixture clean", () => {
     const fixtureName = "real-world-safe-filesystem.json";
     const expectedFindings = loadFixture("expected-findings.json") as Record<

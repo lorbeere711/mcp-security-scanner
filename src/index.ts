@@ -1,5 +1,6 @@
 import { scanDataExfiltration } from "./scanners/dataExfiltration.js";
 import { scanMetadata } from "./scanners/metadata.js";
+import { scanNetworkTools } from "./scanners/networkTools.js";
 import { scanPermissions } from "./scanners/permissions.js";
 import { scanPromptInjection } from "./scanners/promptInjection.js";
 import { scanToolDescriptions } from "./scanners/toolDescriptions.js";
@@ -7,6 +8,7 @@ import type { ScanResult, Scanner } from "./types.js";
 
 const scanners: Scanner[] = [
   scanPermissions,
+  scanNetworkTools,
   scanPromptInjection,
   scanToolDescriptions,
   scanDataExfiltration,
