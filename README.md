@@ -42,6 +42,7 @@ This project is intentionally different from runtime sandboxing and broad resear
 - Potential data exfiltration paths
 - Missing metadata signals (name/license)
 - Broad filesystem/network permissions without allowlists
+- Network-capable tools without outbound domain or host allowlists
 - Risk score (`0-100`) with severity-oriented report output
 
 ## Why

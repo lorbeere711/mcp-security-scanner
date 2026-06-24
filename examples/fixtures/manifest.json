@@ -5,7 +5,7 @@
       "id": "unsafe-obvious-exfil",
       "path": "unsafe/obvious-exfil.json",
       "classification": "unsafe",
-      "expectedFindingIds": ["PERM-001", "PERM-003", "EXFIL-001"],
+      "expectedFindingIds": ["PERM-001", "PERM-003", "EXFIL-001", "NET-001"],
       "mustMissFindingIds": [],
       "notes": "Baseline unsafe case with explicit external upload behavior and sensitive credentials."
     },
