@@ -12,7 +12,7 @@ import {
   formatSarifReport,
   type ReportFormat
 } from "./reporter.js";
-import { scanMcpConfig } from "./index.js";
+import { applySuppressions, scanMcpConfig } from "./index.js";
 import {
   exitCodeForFindings,
   parseFailOnThreshold,
@@ -94,6 +94,8 @@ function registerScanLikeCommand(name: string, description: string): void {
             }
           }
 
+          result.findings = applySuppressions(result.findings, input.config);
+
           const format = parseFormat(options.format);
           const output = renderByFormat(format, result);
 
@@ -106,7 +108,7 @@ function registerScanLikeCommand(name: string, description: string): void {
           }
 
           process.exitCode = exitCodeForFindings(
-            result.findings,
+            result.findings.filter((finding) => !finding.suppressed),
             options.failOn
           );
         } catch (error) {

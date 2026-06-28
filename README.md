@@ -93,6 +93,22 @@ CI failure threshold:
 - `--fail-on low`: fail on any finding
 - `--fail-on none`: report-only mode, never fail because of findings
 
+Suppress known findings by rule id and location in the scanned config:
+
+```json
+{
+  "suppressions": [
+    {
+      "ruleId": "PERM-001",
+      "target": "permissions",
+      "reason": "Local-only dev server with explicit approval"
+    }
+  ]
+}
+```
+
+Suppressed findings remain in JSON output with `suppressed: true`, but default text output and exit-code thresholds ignore them.
+
 Experimental local AI review:
 
 - `--ai-review`: run optional semantic review with a local model
@@ -153,6 +169,7 @@ Each `Finding` object:
 | `source` | `"deterministic" \| "ai" \| undefined` | Finding source, present for AI findings |
 | `confidence` | `"low" \| "medium" \| "high" \| undefined` | Confidence level for AI findings |
 | `evidence` | `string[] \| undefined` | Evidence snippets for AI findings |
+| `suppressed` | `boolean \| undefined` | Present as `true` when a finding matched a configured suppression |
 
 Example output:
 

@@ -21,7 +21,8 @@ const riskPoints: Record<Finding["severity"], number> = {
 export type ReportFormat = "text" | "json" | "sarif" | "markdown";
 
 export function formatReport(result: ScanResult): string {
-  const sorted = [...result.findings].sort(
+  const visibleFindings = result.findings.filter((finding) => !finding.suppressed);
+  const sorted = visibleFindings.sort(
     (a, b) => severityWeight[b.severity] - severityWeight[a.severity]
   );
 
