@@ -29,6 +29,46 @@ describe("scanMcpConfig", () => {
     expect(result.findings.some((f) => f.id === "PERM-001")).toBe(true);
   });
 
+  it("marks findings suppressed by rule id and target location", () => {
+    const result = scanMcpConfig("sample.json", {
+      permissions: ["shell"],
+      name: "dangerous-server",
+      license: "MIT",
+      suppressions: [
+        {
+          ruleId: "PERM-001",
+          target: "permissions",
+          reason: "Local-only dev fixture"
+        }
+      ]
+    });
+
+    const finding = result.findings.find((f) => f.id === "PERM-001");
+
+    expect(finding).toBeDefined();
+    expect(finding?.suppressed).toBe(true);
+  });
+
+  it("does not suppress findings when the target location does not match", () => {
+    const result = scanMcpConfig("sample.json", {
+      permissions: ["shell"],
+      name: "dangerous-server",
+      license: "MIT",
+      suppressions: [
+        {
+          ruleId: "PERM-001",
+          target: "tools.fetch_url",
+          reason: "Different finding location"
+        }
+      ]
+    });
+
+    const finding = result.findings.find((f) => f.id === "PERM-001");
+
+    expect(finding).toBeDefined();
+    expect(finding?.suppressed).toBeUndefined();
+  });
+
   it("returns no findings for safe config", () => {
     const result = scanMcpConfig("safe.json", {
       permissions: ["filesystem:read"],

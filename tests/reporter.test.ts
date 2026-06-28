@@ -43,6 +43,23 @@ const sampleResultWithoutPath: ScanResult = {
   ]
 };
 
+const sampleResultWithSuppression: ScanResult = {
+  schemaVersion: "1.0.0",
+  target: "examples/insecure.json",
+  scannedAt: "2026-06-13T00:00:00.000Z",
+  findings: [
+    {
+      id: "PERM-001",
+      severity: "high",
+      title: "Dangerous permission detected",
+      description: "Permission shell can enable high-impact actions.",
+      recommendation: "Apply least-privilege.",
+      path: "permissions",
+      suppressed: true
+    }
+  ]
+};
+
 const sampleResultWithAiMetadata: ScanResult = {
   schemaVersion: "1.0.0",
   target: "examples/insecure.json",
@@ -111,6 +128,23 @@ describe("reporters", () => {
       "severity",
       "title"
     ]);
+  });
+
+  it("keeps suppressed findings in json reports", () => {
+    const json = formatJsonReport(sampleResultWithSuppression);
+    const parsed = JSON.parse(json) as ScanResult;
+
+    expect(parsed.findings).toHaveLength(1);
+    expect(parsed.findings[0]?.suppressed).toBe(true);
+  });
+
+  it("hides suppressed findings from text reports by default", () => {
+    const text = formatReport(sampleResultWithSuppression);
+
+    expect(text).toContain("Findings: 0");
+    expect(text).toContain("Risk Score: 0/100 (LOW)");
+    expect(text).toContain("No findings detected.");
+    expect(text).not.toContain("PERM-001");
   });
 
   it("renders sarif report", () => {
